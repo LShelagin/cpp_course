@@ -1,0 +1,3 @@
+D:/PGTU/OEVMiA/OEVM/CppDistro/CppDistro/lw2/13/CMakeFiles/13.dir
+D:/PGTU/OEVMiA/OEVM/CppDistro/CppDistro/lw2/13/CMakeFiles/edit_cache.dir
+D:/PGTU/OEVMiA/OEVM/CppDistro/CppDistro/lw2/13/CMakeFiles/rebuild_cache.dir

@@ -33,7 +33,7 @@ int main()
         float x = x + speedX * dt;
         float y = amplitudeY * std::sin(wavePhase / periodY);
         sf::Vector2f offset = {x, y};
-        if (x + 2 * BALL_SIZE >= 800)
+        if (x + 2 * BALL_SIZE >= WINDOW_WIDTH)
         {
             speedX = -speedX;
         }

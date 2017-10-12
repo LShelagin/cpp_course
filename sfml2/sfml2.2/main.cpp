@@ -22,7 +22,6 @@ int main()
     sf::Vector2f position = {0, 0};
     float time = 0;
     float speedY = 20.f;
-    float speedX = 20.f;
     ellipse.setPointCount(pointCount);
     for (int pointNo = 0; pointNo < pointCount; ++pointNo)
     {
@@ -47,7 +46,7 @@ int main()
         const float wavePhase = time * float(2 * M_PI);
         float x = 300 + round(200 * cos(time));
         float y = 300 + round(200 * sin(time));
-        if (y + 200 >= 1 / 2 * WINDOW_HEIGHT)
+        if (y + 200 >= WINDOW_HEIGHT / 2)
         {
             speedY = -speedY;
         }

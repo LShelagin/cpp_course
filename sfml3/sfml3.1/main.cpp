@@ -2,7 +2,6 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
- 
 void init(sf::ConvexShape &pointer)
 {
     pointer.setPointCount(3);
@@ -12,16 +11,13 @@ void init(sf::ConvexShape &pointer)
     pointer.setPosition({400, 300});
     pointer.setFillColor(sf::Color(70, 20, 49));
 }
- 
 float toDegrees(float radians)
 {
     return float(double(radians) * 180.0 / M_PI);
-}
- 
+} 
 void onMouseMove(const sf::Event::MouseMoveEvent &event, sf::Vector2f &mousePosition)
 {
     std::cout << "mouse x=" << event.x << ", y=" << event.y << std::endl;
- 
     mousePosition = {float(event.x), float(event.y)};
 }
 void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition)
@@ -41,8 +37,7 @@ void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition)
             break;
         }
     }
-}
- 
+} 
 void update(const sf::Vector2f &mousePosition, sf::ConvexShape &pointer, float &deltaTime)
 {
     const sf::Vector2f delta = mousePosition - pointer.getPosition();
@@ -65,8 +60,7 @@ void update(const sf::Vector2f &mousePosition, sf::ConvexShape &pointer, float &
         {
             pointer.setRotation(pointer.getRotation() + std::min(maxRotation, rotation));
         }
-    }
-        
+    }       
     else
     {
         if ((angle + pointer.getRotation()) < 180)
@@ -78,15 +72,13 @@ void update(const sf::Vector2f &mousePosition, sf::ConvexShape &pointer, float &
             pointer.setRotation(pointer.getRotation() - std::min(maxRotation, rotation));
         }
     }
-}
- 
+} 
 void redrawFrame(sf::RenderWindow &window, sf::ConvexShape &pointer)
 {
     window.clear();
     window.draw(pointer);
     window.display();
-}
- 
+} 
 int main()
 {
     constexpr unsigned WINDOW_WIDTH = 800;

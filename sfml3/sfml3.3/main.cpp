@@ -10,7 +10,7 @@ struct Eye
     float rotation = 0;
 };
 
-sf::Vector2f toEucledian(float x, float y, float angle)
+sf::Vector2f toTriganFunct(float x, float y, float angle)
 {
     return {x * std::cos(angle), y * std::sin(angle)};
 }
@@ -24,14 +24,14 @@ void updateLeftEye(Eye &leftEye)
 {
     const sf::Vector2f rotationRadius = {30.f, 50.f};
 
-    const sf::Vector2f whiteLeftEye = toEucledian(rotationRadius.x, rotationRadius.y, leftEye.rotation);
+    const sf::Vector2f whiteLeftEye = toTriganFunct(rotationRadius.x, rotationRadius.y, leftEye.rotation);
     leftEye.pupil.setPosition(leftEye.position + whiteLeftEye);
 }
 void updateRightEye(Eye &rightEye)
 {
     const sf::Vector2f rotationRadius = {30.f, 50.f};
 
-    const sf::Vector2f whiteRightEye = toEucledian(rotationRadius.x, rotationRadius.y, rightEye.rotation);
+    const sf::Vector2f whiteRightEye = toTriganFunct(rotationRadius.x, rotationRadius.y, rightEye.rotation);
     rightEye.pupil.setPosition(rightEye.position + whiteRightEye);
 }
 

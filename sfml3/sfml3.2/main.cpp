@@ -17,7 +17,7 @@ sf::Vector2f toEuclidian(float x, float y, float angle)
 
 void updateElements(Eye &leftEye, Eye &rightEye)
 {
-    const sf::Vector2f rotationRadius = {30.f, 50.f};
+    const float rotationRadius = 30.f;
 
     const sf::Vector2f whiteLeftEye = toEuclidian(rotationRadius.x, rotationRadius.y, leftEye.rotation);
     leftEye.pupil.setPosition(leftEye.position + whiteLeftEye);

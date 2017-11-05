@@ -5,10 +5,6 @@
 #include <iostream>
 constexpr unsigned WINDOW_WIDTH = 800;
 constexpr unsigned WINDOW_HEIGHT = 600;
-float toDegrees(float radius)
-{
-    return float(double(radius) * 180.0 / M_PI);
-}
 int main()
 {
     constexpr int pointCount = 200;
@@ -21,7 +17,6 @@ int main()
     ellipse.setFillColor(sf::Color(0xFF, 0x09, 0x80));
     sf::Vector2f position = {0, 0};
     float time = 0;
-    float speedY = 20.f;
     ellipse.setPointCount(pointCount);
     for (int pointNo = 0; pointNo < pointCount; ++pointNo)
     {
@@ -43,14 +38,7 @@ int main()
         }
         const float dt = clock.restart().asSeconds();
         time = time + dt;
-        const float wavePhase = time * float(2 * M_PI);
-        float x = 300 + round(200 * cos(time));
-        float y = 300 + round(200 * sin(time));
-        if (y + 200 >= WINDOW_HEIGHT / 2)
-        {
-            speedY = -speedY;
-        }
-        sf::Vector2f offset = {x, y};
+        sf::Vector2f offset = {400 + float(200 * cos(time)), 300 + float(200 * sin(time))};
         ellipse.setPosition(position + offset);
         window.clear();
         window.draw(ellipse);

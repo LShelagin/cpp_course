@@ -22,14 +22,14 @@ float cursorInEye(const sf::Vector2f &mousePosition, const sf::Vector2f &positio
 
 void updateLeftEye(Eye &leftEye)
 {
-    const sf::Vector2f rotationRadius = {30.f, 60.f};
+    const sf::Vector2f rotationRadius = {50.f, 90.f};
 
     const sf::Vector2f whiteLeftEye = toEuclidian(rotationRadius.x, rotationRadius.y, leftEye.rotation);
     leftEye.pupil.setPosition(leftEye.position + whiteLeftEye);
 }
 void updateRightEye(Eye &rightEye)
 {
-    const sf::Vector2f rotationRadius = {30.f, 60.f};
+    const sf::Vector2f rotationRadius = {50.f, 90.f};
 
     const sf::Vector2f whiteRightEye = toEuclidian(rotationRadius.x, rotationRadius.y, rightEye.rotation);
     rightEye.pupil.setPosition(rightEye.position + whiteRightEye);

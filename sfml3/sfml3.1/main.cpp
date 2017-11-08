@@ -2,6 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
+
 void init(sf::ConvexShape &pointer)
 {
     pointer.setPointCount(3);
@@ -11,13 +12,16 @@ void init(sf::ConvexShape &pointer)
     pointer.setPosition({400, 300});
     pointer.setFillColor(sf::Color(70, 20, 49));
 }
+
 float toDegrees(float radians)
 {
     return float(double(radians) * 180.0 / M_PI);
-} 
+}
+
 void onMouseMove(const sf::Event::MouseMoveEvent &event, sf::Vector2f &mousePosition)
 {
     std::cout << "mouse x=" << event.x << ", y=" << event.y << std::endl;
+
     mousePosition = {float(event.x), float(event.y)};
 }
 void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition)
@@ -37,48 +41,54 @@ void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition)
             break;
         }
     }
-} 
+}
+
 void update(const sf::Vector2f &mousePosition, sf::ConvexShape &pointer, float &deltaTime)
 {
     const sf::Vector2f delta = mousePosition - pointer.getPosition();
-    float maxAngulerSpeed = 15;
     float angle = atan2(delta.y, delta.x);
     if (angle < 0)
     {
         angle = angle + 2 * M_PI;
     }
     angle = toDegrees(angle);
-    const float maxRotation = maxAngulerSpeed * deltaTime;
+    const float maxRotation = 15 * deltaTime;
     const float rotation = std::abs(angle - pointer.getRotation());
-    if (angle > pointer.getRotation())
+    if (angle != pointer.getRotation())
     {
-        if ((angle - pointer.getRotation()) > 180)
+        if (angle > pointer.getRotation())
         {
-            pointer.setRotation(pointer.getRotation() - std::min(maxRotation, rotation));
+            if ((angle - 180) > pointer.getRotation())
+            {
+                pointer.setRotation(pointer.getRotation() - std::min(maxRotation, rotation));
+            }
+            else
+            {
+                pointer.setRotation(pointer.getRotation() + std::min(maxRotation, rotation));
+            }
         }
+
         else
         {
-            pointer.setRotation(pointer.getRotation() + std::min(maxRotation, rotation));
-        }
-    }       
-    else
-    {
-        if ((angle + pointer.getRotation()) < 180)
-        {
-            pointer.setRotation(pointer.getRotation() + std::min(maxRotation, rotation));
-        }
-        else
-        {
-            pointer.setRotation(pointer.getRotation() - std::min(maxRotation, rotation));
+            if ((angle + 180) < pointer.getRotation())
+            {
+                pointer.setRotation(pointer.getRotation() + std::min(maxRotation, rotation));
+            }
+            else
+            {
+                pointer.setRotation(pointer.getRotation() - std::min(maxRotation, rotation));
+            }
         }
     }
-} 
+}
+
 void redrawFrame(sf::RenderWindow &window, sf::ConvexShape &pointer)
 {
     window.clear();
     window.draw(pointer);
     window.display();
-} 
+}
+
 int main()
 {
     constexpr unsigned WINDOW_WIDTH = 800;

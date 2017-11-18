@@ -29,7 +29,6 @@ void init(Cat &cat, Laser &laser)
 
     cat.sprite.setTexture(cat.texture);
     cat.sprite.setPosition(15, 15);
-    cat.sprite.setScale(1, 1);
 
     laser.texture.loadFromFile("./laser.png");
     laser.sprite.setTexture(laser.texture);
@@ -39,6 +38,7 @@ void onMouseClick(sf::Event::MouseButtonEvent &event, sf::Vector2f &mousePositio
 {
     laser.scale = {1, 1};
     mousePosition = {float(event.x), float(event.y)};
+    laser.sprite.setPosition(mousePosition);
 }
 
 void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition, Laser &laser)
@@ -60,23 +60,19 @@ void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition, Laser &la
     }
 }
 
-void update(const sf::Vector2f &mousePosition, Cat &cat, Laser &laser, float &deltaTime)
+void update(sf::Vector2f &mousePosition, Cat &cat, Laser &laser, float deltaTime)
 {
     const sf::Vector2f delta = mousePosition - cat.position;
     float angle = atan2(delta.y, delta.x);
-    sf::Vector2f direction = (delta / hypotf(delta.x, delta.y));
+    sf::Vector2f direction = {0, 0};
     float speed = 100.f;
-    if (hypotf(delta.x, delta.y) != 0.f)
-    {
-        cat.position += direction * speed * deltaTime;
-        cat.sprite.setPosition(cat.position);
-    }
     if (angle < 0)
     {
-        angle = angle + 2 * M_PI;
+        angle += float(2 * M_PI);
     }
     angle = toDegrees(angle);
-    if (((angle <= 90) && (angle >= 0)) || ((angle >= 270) && (angle <= 360)))
+
+    if (((angle >= 0) && (angle < 90)) || ((angle <= 360) && (angle > 270)))
     {
         cat.sprite.setScale(1, 1);
     }
@@ -85,7 +81,16 @@ void update(const sf::Vector2f &mousePosition, Cat &cat, Laser &laser, float &de
         cat.sprite.setScale(-1, 1);
     }
 
-    laser.sprite.setPosition(mousePosition);
+    if (hypotf(delta.x, delta.y) != 0.f)
+    {
+        direction = (delta / hypotf(delta.x, delta.y));
+    }
+
+    speed = std::min(hypotf(delta.x, delta.y), speed * deltaTime);
+
+    cat.position += direction * speed;
+    cat.sprite.setPosition(cat.position);
+    cat.sprite.setScale(cat.sprite.getScale());
 }
 
 void redrawFrame(sf::RenderWindow &window, Cat &cat, Laser &laser)

@@ -1,5 +1,4 @@
 #include <SFML\Graphics.hpp>
-#include <SFML\System.hpp>
 #include <SFML\Window.hpp>
 #include <cmath>
 #include <iostream>
@@ -29,7 +28,13 @@ void initGenerator(PRNG &generator)
 
 float getRandomFloat(PRNG &generator)
 {
-    uniform_real_distribution<float> distribution(50, 150);
+    uniform_real_distribution<float> distribution(100, 200);
+    return distribution(generator.engine);
+}
+
+unsigned getRandomColor(PRNG &generator)
+{
+    std::uniform_int_distribution<unsigned> distribution(0, 255);
     return distribution(generator.engine);
 }
 
@@ -91,6 +96,7 @@ int main()
     PRNG generator;
     initGenerator;
     Clock clock;
+    Color color;
 
     constexpr unsigned WINDOW_WIDTH = 800;
     constexpr unsigned WINDOW_HEIGHT = 600;
@@ -106,9 +112,12 @@ int main()
     for (int i = 0; i < size(balls); ++i)
     {
         balls[i].ball.setPosition(120.f * i + 30, 100.f * i);
-        balls[i].ball.setFillColor(sf::Color(50 * i, 255, 100));
+        float red = getRandomColor(generator);
+        float green = getRandomColor(generator);
+        float blue = getRandomColor(generator);
         float speedX = getRandomFloat(generator);
         float speedY = getRandomFloat(generator);
+        balls[i].ball.setFillColor(sf::Color(red, green, blue));
         balls[i].speed = {speedX, speedY};
         balls[i].ball.setRadius(BALL_SIZE);
     }

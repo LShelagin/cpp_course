@@ -98,7 +98,7 @@ bool removeBalls(Ball ball)
     return (ball.timeOfDeath <= 0);
 }
 
-removeDeathBalls(vector<Ball> &balls)
+void removeDeathBalls(vector<Ball> &balls)
 {
     auto iterator = remove_if(balls.begin(), balls.end(), removeBalls);
     balls.erase(iterator, balls.end());

@@ -59,7 +59,7 @@ bool removeBalls(Ball ball)
     return (ball.timeOfDeath <= 0);
 }
 
-removeDeathBalls(vector<Ball> &balls)
+void removeDeathBalls(vector<Ball> &balls)
 {
     auto iterator = remove_if(balls.begin(), balls.end(), removeBalls);
     balls.erase(iterator, balls.end());
@@ -105,10 +105,10 @@ void initNewBall(Event::MouseButtonEvent &event, vector<Ball> &balls, const unsi
         Ball newBall;
         newBall.ball.setPosition(mousePosition);
         newBall.ball.setRadius(BALL_SIZE);
+        createNewBall(balls, colors, generator);
         float speedX = getRandomFloat(generator);
         float speedY = getRandomFloat(generator);
         newBall.speed = {speedX, speedY};
-        createNewBall(balls, colors, generator);
         balls.push_back(newBall);
     }
 }
@@ -128,6 +128,25 @@ void pollEvents(vector<Ball> &balls, RenderWindow &window, const float BALL_SIZE
             break;
         default:
             break;
+        }
+    }
+}
+
+void ballCollision(vector<Ball> &balls, const unsigned BALL_SIZE)
+{
+    for (int fi = 0; fi < size(balls); ++fi)
+    {
+        for (int si = fi + 1; si < size(balls); ++si)
+        {
+            Vector2f deltaPosition = balls[si].position - balls[fi].position;
+            Vector2f deltaSpeed = balls[si].speed - balls[fi].speed;
+            float distance = sqrt(pow(deltaPosition.x, 2) + pow(deltaPosition.y, 2));
+            float changeSpeed = ((deltaPosition.x * deltaSpeed.x) + (deltaPosition.y * deltaSpeed.y)) / pow(distance, 2);
+            if (distance <= (2 * BALL_SIZE))
+            {
+                balls[fi].speed = balls[fi].speed + changeSpeed * deltaPosition;
+                balls[si].speed = balls[si].speed - changeSpeed * deltaPosition;
+            }
         }
     }
 }
@@ -160,21 +179,7 @@ void update(vector<Ball> &balls, const float deltaTime, const unsigned WINDOW_WI
         balls[i].ball.setPosition(balls[i].position);
         balls[i].timeOfDeath -= deltaTime;
     }
-    for (int fi = 0; fi < size(balls); ++fi)
-    {
-        for (int si = fi + 1; si < size(balls); ++si)
-        {
-            Vector2f deltaPosition = balls[si].position - balls[fi].position;
-            Vector2f deltaSpeed = balls[si].speed - balls[fi].speed;
-            float distance = sqrt(pow(deltaPosition.x, 2) + pow(deltaPosition.y, 2));
-            float changeSpeed = ((deltaPosition.x * deltaSpeed.x) + (deltaPosition.y * deltaSpeed.y)) / pow(distance, 2);
-            if (distance <= (2 * BALL_SIZE))
-            {
-                balls[fi].speed = balls[fi].speed + changeSpeed * deltaPosition;
-                balls[si].speed = balls[si].speed - changeSpeed * deltaPosition;
-            }
-        }
-    }
+    ballCollision(balls, BALL_SIZE);
 }
 
 int main()

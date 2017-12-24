@@ -1,7 +1,7 @@
 #include <SFML\Graphics.hpp>
 #include <SFML\Window.hpp>
 #include <cmath>
-#include <iostream>
+#include <cassert>
 #include <random>
 
 using namespace sf;
@@ -54,6 +54,45 @@ Color getRandomColor(PRNG &generator, vector<Color> &colors)
     return randomColor;
 }
 
+bool areCloseAbsolute(float firstArgument, float secondArgument, float tolerance)
+{
+    return std::abs(firstArgument - secondArgument) < tolerance;
+}
+
+bool areCloseRelative(float firstArgument, float secondArgument, float tolerance)
+{
+    return std::abs((firstArgument - secondArgument) / secondArgument) < tolerance;
+}
+
+bool areFuzzyEqual(float firstArgument, float secondArgument, float tolerance)
+{
+    if (std::abs(secondArgument) > 1.f)
+    {
+        return areCloseRelative(firstArgument, secondArgument, tolerance);
+    }
+    return areCloseAbsolute(firstArgument, secondArgument, tolerance);
+}
+
+float getImpuls(vector<Ball> &balls, const float BALL_SIZE)
+{
+    float impuls;
+    for (int i = 1; i < size(balls); ++i)
+    {
+        impuls += pow(BALL_SIZE, 3) * sqrt(pow(balls[i].speed.x, 2) + pow(balls[i].speed.y, 2));
+    }
+    return impuls;
+}
+
+float getEnergy(vector<Ball> &balls, const float BALL_SIZE)
+{
+    float energy;
+    for (int i = 1; i < size(balls); ++i)
+    {
+        energy += pow(BALL_SIZE, 3) * (pow(balls[i].speed.x, 2) + pow(balls[i].speed.y, 2));
+    }
+    return energy;
+}
+
 bool removeBalls(Ball ball)
 {
     return (ball.timeOfDeath <= 0);
@@ -103,12 +142,12 @@ void initNewBall(Event::MouseButtonEvent &event, vector<Ball> &balls, const unsi
         Color color;
 
         Ball newBall;
+        createNewBall(balls, colors, generator);
         newBall.ball.setPosition(mousePosition);
         newBall.ball.setRadius(BALL_SIZE);
         float speedX = getRandomFloat(generator);
         float speedY = getRandomFloat(generator);
         newBall.speed = {speedX, speedY};
-        createNewBall(balls, colors, generator);
         balls.push_back(newBall);
     }
 }
@@ -132,7 +171,33 @@ void pollEvents(vector<Ball> &balls, RenderWindow &window, const float BALL_SIZE
     }
 }
 
-void update(vector<Ball> &balls, const float deltaTime, const unsigned WINDOW_WIDTH = 800, const unsigned WINDOW_HEIGHT = 600, const unsigned BALL_SIZE = 30)
+void ballCollision(vector<Ball> &balls, const unsigned BALL_SIZE)
+{
+    float tolerance = 0.1f;
+    float oldEnergy = getEnergy(balls, BALL_SIZE);
+    float oldImpuls = getImpuls(balls, BALL_SIZE);
+    for (int fi = 0; fi < size(balls); ++fi)
+    {
+        for (int si = fi + 1; si < size(balls); ++si)
+        {
+            Vector2f deltaPosition = balls[si].position - balls[fi].position;
+            Vector2f deltaSpeed = balls[si].speed - balls[fi].speed;
+            float distance = sqrt(pow(deltaPosition.x, 2) + pow(deltaPosition.y, 2));
+            float changeSpeed = ((deltaPosition.x * deltaSpeed.x) + (deltaPosition.y * deltaSpeed.y)) / pow(distance, 2);
+            if (distance <= (2 * BALL_SIZE))
+            {
+                balls[fi].speed = balls[fi].speed + changeSpeed * deltaPosition;
+                balls[si].speed = balls[si].speed - changeSpeed * deltaPosition;
+            }
+        }
+    }
+    float newEnergy = getEnergy(balls, BALL_SIZE);
+    float newImpuls = getImpuls(balls, BALL_SIZE);
+    assert(areFuzzyEqual(newEnergy, oldEnergy, tolerance));
+    assert(areFuzzyEqual(newImpuls, oldImpuls, tolerance));
+}
+
+void update(vector<Ball> &balls, const float deltaTime, const unsigned WINDOW_WIDTH, const unsigned WINDOW_HEIGHT, const unsigned BALL_SIZE)
 {
     removeDeathBalls(balls);
     for (int i = 0; i < size(balls); ++i)
@@ -160,21 +225,8 @@ void update(vector<Ball> &balls, const float deltaTime, const unsigned WINDOW_WI
         balls[i].ball.setPosition(balls[i].position);
         balls[i].timeOfDeath -= deltaTime;
     }
-    for (int fi = 0; fi < size(balls); ++fi)
-    {
-        for (int si = fi + 1; si < size(balls); ++si)
-        {
-            Vector2f deltaPosition = balls[si].position - balls[fi].position;
-            Vector2f deltaSpeed = balls[si].speed - balls[fi].speed;
-            float distance = sqrt(pow(deltaPosition.x, 2) + pow(deltaPosition.y, 2));
-            float changeSpeed = ((deltaPosition.x * deltaSpeed.x) + (deltaPosition.y * deltaSpeed.y)) / pow(distance, 2);
-            if (distance <= (2 * BALL_SIZE))
-            {
-                balls[fi].speed = balls[fi].speed + changeSpeed * deltaPosition;
-                balls[si].speed = balls[si].speed - changeSpeed * deltaPosition;
-            }
-        }
-    }
+
+    ballCollision(balls, BALL_SIZE);
 }
 
 int main()

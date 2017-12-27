@@ -64,8 +64,9 @@ bool areCloseRelative(float firstArgument, float secondArgument, float tolerance
     return std::abs((firstArgument - secondArgument) / secondArgument) < tolerance;
 }
 
-bool areFuzzyEqual(float firstArgument, float secondArgument, float tolerance)
+bool areFuzzyEqual(float firstArgument, float secondArgument)
 {
+    float tolerance = 0.001;
     if (std::abs(secondArgument) > 1.f)
     {
         return areCloseRelative(firstArgument, secondArgument, tolerance);
@@ -73,20 +74,26 @@ bool areFuzzyEqual(float firstArgument, float secondArgument, float tolerance)
     return areCloseAbsolute(firstArgument, secondArgument, tolerance);
 }
 
-float getImpuls(vector<Ball> &balls, const float BALL_SIZE)
+bool areVectorFuzzyEqual(Vector2f firstArgument, Vector2f secondArgument)
 {
-    float impuls;
-    for (int i = 1; i < size(balls); ++i)
+    bool areFirstArgumentEqual = areFuzzyEqual(firstArgument.x, secondArgument.x);
+    bool areSecondArgumentEqual = areFuzzyEqual(firstArgument.y, secondArgument.y);
+}
+
+Vector2f getImpulse(vector<Ball> &balls)
+{
+    Vector2f impulse;
+    for (int i = 0; i < size(balls); ++i)
     {
-        impuls += pow(BALL_SIZE, 3) * sqrt(pow(balls[i].speed.x, 2) + pow(balls[i].speed.y, 2));
+        impulse += balls[i].speed;
     }
-    return impuls;
+    return impulse;
 }
 
 float getEnergy(vector<Ball> &balls, const float BALL_SIZE)
 {
     float energy;
-    for (int i = 1; i < size(balls); ++i)
+    for (int i = 0; i < size(balls); ++i)
     {
         energy += pow(BALL_SIZE, 3) * (pow(balls[i].speed.x, 2) + pow(balls[i].speed.y, 2));
     }
@@ -173,9 +180,8 @@ void pollEvents(vector<Ball> &balls, RenderWindow &window, const float BALL_SIZE
 
 void ballCollision(vector<Ball> &balls, const unsigned BALL_SIZE)
 {
-    float tolerance = 0.1f;
     float oldEnergy = getEnergy(balls, BALL_SIZE);
-    float oldImpuls = getImpuls(balls, BALL_SIZE);
+    Vector2f oldImpulse = getImpulse(balls);
     for (int fi = 0; fi < size(balls); ++fi)
     {
         for (int si = fi + 1; si < size(balls); ++si)
@@ -192,9 +198,9 @@ void ballCollision(vector<Ball> &balls, const unsigned BALL_SIZE)
         }
     }
     float newEnergy = getEnergy(balls, BALL_SIZE);
-    float newImpuls = getImpuls(balls, BALL_SIZE);
-    assert(areFuzzyEqual(newEnergy, oldEnergy, tolerance));
-    assert(areFuzzyEqual(newImpuls, oldImpuls, tolerance));
+    Vector2f newImpulse = getImpulse(balls);
+    assert(areVectorFuzzyEqual(newImpulse, oldImpulse));
+    assert(areFuzzyEqual(newEnergy, oldEnergy));
 }
 
 void update(vector<Ball> &balls, const float deltaTime, const unsigned WINDOW_WIDTH, const unsigned WINDOW_HEIGHT, const unsigned BALL_SIZE)

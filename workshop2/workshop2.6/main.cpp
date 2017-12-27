@@ -75,11 +75,12 @@ void redrawFrame(RenderWindow &window, vector<Ball> &balls)
     window.display();
 }
 
-void createNewBall(vector<Ball> &balls, vector<Color> &colors, PRNG &generator)
+void createNewBall(vector<Ball> &balls, vector<Color> &colors, PRNG &generator, const unsigned BALL_SIZE)
 {
     for (int i = 0; i < size(balls); ++i)
     {
         balls[i].ball.setFillColor(getRandomColor(generator, colors));
+        balls[i].ball.setRadius(BALL_SIZE);
     }
 }
 
@@ -104,8 +105,7 @@ void initNewBall(Event::MouseButtonEvent &event, vector<Ball> &balls, const unsi
 
         Ball newBall;
         newBall.ball.setPosition(mousePosition);
-        createNewBall(balls, colors, generator);
-        newBall.ball.setRadius(BALL_SIZE);
+        createNewBall(balls, colors, generator, BALL_SIZE);
         float speedX = getRandomFloat(generator);
         float speedY = getRandomFloat(generator);
         newBall.speed = {speedX, speedY};
